@@ -48,8 +48,6 @@ void sortList(BCP* unidade){
 } 
 
 int verificaFilaProcessos(GP* unidade, ESCALONADOR* escal){
-
-    //printf("Tempo CPU [%d] : P[%d]-Tempo de Chegada[%d]\n\n",escal->tempo,unidade->fila_processos->prox->id,unidade->fila_processos->prox->tempo_chegada);
     /*Se existir processos e o tempo de CPU for >= ao menor tempo na fila então escalona*/
      if((unidade->fila_processos != NULL) && (escal->tempo >= unidade->fila_processos->prox->tempo_chegada ) ){   
         escalonar(escal,&unidade->fila_processos,&unidade->fila_pronto);
@@ -100,7 +98,7 @@ int escalonar(ESCALONADOR* escal, BCP** origem, BCP** destino){
 int solicitaIO(BCP* processo, ESCALONADOR* escal){
     int i = 0;
     while(processo->filaIO[i] != -10){
-        if(processo->filaIO[i] == processo->tempo_executado){
+        if(processo->filaIO[i] >= processo->tempo_executado){
 
             /*Deslocamento do Vetor para Excluir aquele tempo de I/0 */
             while(processo->filaIO[i] != -10){
@@ -133,7 +131,7 @@ void FIFO(GP* unidade){
             processo->tempo_inicio = escalonador->tempo;
         
             while( (processo->tempo_cpu) - (processo->tempo_executado) > 0){
-                printf("|Processo [%d] - Tempo [%d]\n", processo->id,processo->tempo_executado);
+                printf("|Processo [%d] - Tempo Exec [%d]\n", processo->id,processo->tempo_executado);
                 processo->tempo_executado++; //Processo Executou 1Clock
                 escalonador->tempo++;
                 verificaFilaProcessos(unidade,escalonador);
@@ -145,6 +143,7 @@ void FIFO(GP* unidade){
                 }
             }
                 printf("+-----------------+\n\n");
+                
                 escalonar(escalonador,&unidade->fila_pronto,&unidade->fila_finalizados); 
                 unidade->fila_finalizados->ant->tempo_fim = escalonador->tempo;
                 
