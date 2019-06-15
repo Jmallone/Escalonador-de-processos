@@ -37,6 +37,7 @@ int main ( void )
          break;
       case 4:
          printf(" ------ Round Robin -------- ");
+         RR(gerenciador);
          break;
       case 5:
          printf(" ------ SRTF -------- ");

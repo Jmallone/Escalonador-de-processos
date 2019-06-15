@@ -96,6 +96,8 @@ void verificar(GP* gerenciador){
       novo = gerenciador->fila_finalizados->prox;
       printf("\033[1;35m");
       printf("Fila de Processos Finalizados: \n");
+      int cont = 0;
+      int soma = 0;
       while(novo->id != -10 && novo != NULL ){
          printf("+---------------------------");
          printf("\n|Id do processo: %d",novo->id);
@@ -105,8 +107,13 @@ void verificar(GP* gerenciador){
          printf("\n|Tempo de Tempo Fim: %d",novo->tempo_fim);
          printf("\n|Tempo Executado: %d",novo->tempo_executado);
          printf("\n+---------------------------\n\n");
+         soma = soma + (novo->tempo_fim - novo->tempo_chegada);
          novo = novo->prox;
+         cont++;
       }
+
+      printf("\nNumero de Processos Executado: %d",cont);
+      printf("\nTempo Médio de Execução: %.1f s",(float)(soma/cont));
    }else{ printf("-----Fila de Processos Finalizados VAZIA -\n"); }
    /* Fim da Fila de Processos PRONTOS*/ 
 
