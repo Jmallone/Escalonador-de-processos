@@ -98,7 +98,6 @@ int escalonar(ESCALONADOR* escal, BCP** origem, BCP** destino){
 }
 
 int solicitaIO(BCP* processo, ESCALONADOR* escal){
-    printf("Verifica I/O : Tempo[%d] ", processo->tempo_executado);
     int i = 0;
     while(processo->filaIO[i] != -10){
         if(processo->filaIO[i] == processo->tempo_executado){
@@ -117,7 +116,7 @@ int solicitaIO(BCP* processo, ESCALONADOR* escal){
 
 
 void FIFO(GP* unidade){
-    printf("\n Entrei no FIFO \n");
+    printf("\n\n+--- STEP-BY-STEP ---- \n");
     /* Cria o escalonador para controlar o tempo */
     ESCALONADOR *escalonador = (ESCALONADOR*)malloc(sizeof(ESCALONADOR));
     escalonador->tempo = 0;
@@ -134,20 +133,22 @@ void FIFO(GP* unidade){
             processo->tempo_inicio = escalonador->tempo;
         
             while( (processo->tempo_cpu) - (processo->tempo_executado) > 0){
-                printf("\nProcesso [%d] - Executado [%d]\n", processo->id,processo->tempo_executado);
+                printf("|Processo [%d] - Tempo [%d]\n", processo->id,processo->tempo_executado);
                 processo->tempo_executado++; //Processo Executou 1Clock
                 escalonador->tempo++;
                 verificaFilaProcessos(unidade,escalonador);
 
                 /* Quando Se faz I/0 demora 3 Clock */
                 if(solicitaIO(processo,escalonador)){
-                    //processo->tempo_executado = processo->tempo_executado + 3;
+                    printf("|Fez I/O no Tempo [%d]\n", processo->tempo_executado);
                     escalonador->tempo = escalonador->tempo + 3;
-                    
                 }
             }
+                printf("+-----------------+\n\n");
                 escalonar(escalonador,&unidade->fila_pronto,&unidade->fila_finalizados); 
                 unidade->fila_finalizados->ant->tempo_fim = escalonador->tempo;
+                
+                /*Ajuste para o Tempo Total Executado Caso o Processo fez I/O*/
                 unidade->fila_finalizados->ant->tempo_executado =( unidade->fila_finalizados->ant->tempo_fim - unidade->fila_finalizados->ant->tempo_inicio);
                 escalonador->tempo++;
 
@@ -156,57 +157,3 @@ void FIFO(GP* unidade){
         }  
    } 
 }
-
-
-
-//void FIFO(GP* unidade){
-//    printf("\n Entrei no FIFO \n");
-//    /* Cria o escalonador para controlar o tempo */
-//    ESCALONADOR *escalonador = (ESCALONADOR*)malloc(sizeof(ESCALONADOR));
-//    escalonador->tempo = 0;
-//
-//    /*Organiza por tempo de chegada*/
-//    sortList(unidade->fila_processos);
-//
-//    /*Se ainda Existir Processos na Fila de Pronto e fila de Procesos */
-//    while( (unidade->fila_pronto != NULL) || (unidade->fila_processos != NULL) ){
-//        
-//        verificaFilaProcessos(unidade,escalonador);
-//        
-//        /* Se existir alguem na Fila de Pronto Executar: Se não fica ocioso*/
-//        if(unidade->fila_pronto != NULL ){
-//            BCP* processo = unidade->fila_pronto->prox;
-//            processo->tempo_inicio = escalonador->tempo;   
-// //           while(1){
-//
-//                verificaFilaProcessos(unidade,escalonador);
-//                if( (processo->tempo_cpu) - (processo->tempo_executado) > 0){
-//                    
-//                    processo->tempo_executado++; //Processo Executou 1Clock
-//                    escalonador->tempo++; //Clock +1
-// //                    if( (processo->tempo_cpu) - (processo->tempo_executado) <= 0){
-//                        
-//                         
-////                        escalonar(escalonador,&unidade->fila_pronto,&unidade->fila_finalizados);
-////                        unidade->fila_finalizados->ant->tempo_fim = escalonador->tempo;
-//  
-// //                       break;
-//                     }
-//
-////                     if(solicitaIO(processo,escalonador)){
-////                        escalonador->tempo = escalonador->tempo + 3;
-////                        break;
-////                     }
-//
-//                }else{
-//                    escalonar(escalonador,&unidade->fila_pronto,&unidade->fila_finalizados); 
-//                    unidade->fila_finalizados->ant->tempo_fim = escalonador->tempo;
-//                }
-// //while_end           }
-//        }
-//        
-//       escalonador->tempo++;
-//   }
-//    
-//}
-//

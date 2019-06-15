@@ -67,13 +67,6 @@ void verificar(GP* gerenciador){
          printf("\n|Tempo de Tempo Inicio: %d",novo->tempo_inicio);
          printf("\n|Tempo de Tempo Fim: %d",novo->tempo_fim);
          printf("\n|Tempo Executado: %d",novo->tempo_executado);
-         if (novo->filaIO[0] != -10) printf("\n|Tempo do I/O: ");
-         
-         int j = 0;
-         while(novo->filaIO[j] != -10){
-            printf(" %d ", novo->filaIO[j]);
-            j++;
-         }
          printf("\n+---------------------------\n\n");
          novo = novo->prox;
       }
@@ -94,9 +87,10 @@ int main ( void )
    while(rodando){
       printf("\nEscolha uma Opcao:");
       printf("\n 1- Verificar Processos");
-      printf("\n 2- FIFO");
-      printf("\n 3- Round Robin");
-      printf("\n 4- Fila com Prioridade");
+      printf("\n 2- Ordenar Por Tempo de Chegada");
+      printf("\n 3- FIFO");
+      printf("\n 4- Round Robin");
+      printf("\n 5- Fila com Prioridade");
       printf("\n 0- Sair\n");
 
       scanf("%d",&escolha);
@@ -106,13 +100,17 @@ int main ( void )
          verificar(gerenciador);
          break;
       case 2:
+         printf(" ------ Ordenação -------- ");
+         sortList(gerenciador->fila_processos);
+         break;
+      case 3:
          printf(" ------ FIFO -------- ");
          FIFO(gerenciador);
          break;
-      case 3:
+      case 4:
          printf(" ------ RR -------- ");
          break;
-      case 4:
+      case 5:
          printf(" ------ Prioridade -------- ");
          break;
       case 0:
