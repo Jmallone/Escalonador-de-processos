@@ -8,6 +8,7 @@ int main ( void )
    char* filename = "input.txt";
    GP* gerenciador = newGP(filename);
 
+   /* Menu */
    int escolha = 0;
    int rodando = 1;
    while(rodando){

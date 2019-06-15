@@ -11,7 +11,7 @@ typedef struct gerenciador {
 }GP;
 
 GP* newGP(char* nomeArquivo); //Cria o Gerenciador de Processos
-void verificar(GP* gerenciador);
+void verificar(GP* gerenciador);// Cria visualmente oque tem dentro das Listas
 
 GP* newGP(char* nomeArquivo){
 
@@ -24,8 +24,8 @@ GP* newGP(char* nomeArquivo){
    FILE *file = fopen ( nomeArquivo, "r" );
    if ( file != NULL )
    {
-      char line [ 128 ]; /* or other suitable maximum line size */
-      while ( fgets ( line, sizeof line, file ) != NULL ) /* read a line */
+      char line [ 128 ]; 
+      while ( fgets ( line, sizeof line, file ) != NULL ) 
       {
             /* Pega cada Linha NewLine */
             addBCP(gerenciador->fila_processos,line);

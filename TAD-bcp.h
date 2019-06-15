@@ -20,17 +20,10 @@ typedef struct bcp{
 
 }BCP;
 
-/*typedef struct nosetor{
-    unsigned long inicio;
-    unsigned long fim;
-    struct nosetor* prox;
-    struct nosetor* ant;
-}NoSetor;*/
-
-BCP* newBCP();
-void addBCP(BCP* unidade ,char* newline);
-void addBCPLista(BCP* processo,BCP** lista);
-void delBCP(BCP* p);
+BCP* newBCP(); // Cria uma Sentinela para a Lista Duplamente Encadeada 
+void addBCP(BCP* unidade ,char* newline);// Popula Struct do BCP com as informações do TXT
+void addBCPLista(BCP* processo,BCP** lista);// Adiciona um Determinado Processo a uma Lista
+void delBCP(BCP* p); // Desvincula o Processo daquela Lista
 
 /* Sentinela */
 BCP* newBCP(){ 
@@ -54,7 +47,6 @@ void addBCP(BCP* unidade ,char* newline){
     char *ptr = strtok(newline, delim);
      while(ptr != NULL){
         tmp[i] = atoi (ptr);
-        //printf("'%s'\n", ptr);
         ptr = strtok(NULL, delim);
         i++;
     }
