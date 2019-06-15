@@ -88,7 +88,7 @@ int escalonar(ESCALONADOR* escal, BCP** origem, BCP** destino){
             
             }
 
-            /* Adiciona o Processo a Lista destino */
+            /* Adiciona o Processo a Lista destino Mas como se fosse Fila */
             addBCPLista(tmp,destino);
         
             return 1;
@@ -171,14 +171,20 @@ void FIFO(GP* unidade){
 }
 
 void RR(GP* unidade){
-    printf("\n\n+--- STEP-BY-STEP ---- \n");
+
+    /*Organiza por tempo de chegada*/
+    sortList(unidade->fila_processos);
+
+    printf("\n\n\n ------ FILAS ANTES ---- \n");
+    verificar(unidade);
+    printf("\n\n");
     
+    printf("\n\n+--- STEP-BY-STEP ---- \n");
     /* Cria o escalonador para controlar o tempo */
     ESCALONADOR *escalonador = (ESCALONADOR*)malloc(sizeof(ESCALONADOR));
     escalonador->tempo = 0;
 
-    /*Organiza por tempo de chegada*/
-    sortList(unidade->fila_processos);
+
 
     /*Se ainda Existir Processos na Fila de Pronto e fila de Procesos */
     while( (unidade->fila_pronto != NULL) || (unidade->fila_processos != NULL) ){
@@ -187,33 +193,57 @@ void RR(GP* unidade){
         
         /* Se existir alguem na Fila de Pronto Executar: Se não fica ocioso*/
         if(unidade->fila_pronto != NULL ){
+            int quantun = 2;
             BCP* processo = unidade->fila_pronto->prox;
             processo->tempo_inicio = escalonador->tempo;
 
             /*Enquanto o processo ainda tiver tempo de CPU continue*/
-            while( (processo->tempo_cpu) - (processo->tempo_executado) > 0){
+            while( (processo->tempo_cpu) - (processo->tempo_executado) > 0 && quantun != 0){
                 printf("|Processo [%d] - Tempo Exec [%d]\n", processo->id,processo->tempo_executado);
                 processo->tempo_executado++; //Processo Executou 1Clock
                 escalonador->tempo++;
+                quantun--;
+                printf("| Q [%d] ---\n",quantun);
+                printf("| CLOCK TIME [%d] ---\n", escalonador->tempo);
 
                 /* Chamo a função para verificar se entrou algum processo no tempo Atual*/
                 verificaFilaProcessos(unidade,escalonador);
-
+                
                 /* Verifica se o Processo Atual vai fazer I/0 */
                 if(solicitaIO(processo,escalonador)){
                     printf("|Fez I/O no Tempo [%d]\n", processo->tempo_executado);
                     /* Quando Se faz I/0 demora 3 Clock */
                     escalonador->tempo = escalonador->tempo + 3;
                 }
+                
             }
                 printf("+-----------------+\n\n");
-                
+
+            /*Se processo Terminou : Não existe tempo para executar*/
+            if((processo->tempo_cpu) - (processo->tempo_executado) <= 0){
                 /*Depois que o Processo Termina ele vai para a Lista de Finalizados */
-                escalonar(escalonador,&unidade->fila_pronto,&unidade->fila_finalizados); 
-                unidade->fila_finalizados->ant->tempo_fim = escalonador->tempo;
+                escalonar(escalonador,&unidade->fila_pronto,&unidade->fila_finalizados);
                 
-                /*Ajuste para o Tempo Total Executado Caso o Processo fez I/O*/
-                unidade->fila_finalizados->ant->tempo_executado =( unidade->fila_finalizados->ant->tempo_fim - unidade->fila_finalizados->ant->tempo_inicio);
+                unidade->fila_finalizados->ant->tempo_fim = escalonador->tempo;
+                //quantun = 0;
+            }
+
+           
+
+            /* Se o quantun acabou mas ainda existe Clock a ser executado no processo */
+            if(quantun == 0 && (processo->tempo_cpu) - (processo->tempo_executado) > 0){
+
+               /* Desvincula Processo Atual */
+                delBCP(processo);
+
+                /* Adiciona Processo Atual ao final da Lista(FILA) de Pronto */
+                addBCPLista(processo,&unidade->fila_pronto);
+                
+            }
+
+                printf("\n\n\n ------DEBUG DAS FILAS ---- \n");
+                verificar(unidade);
+                printf("\n\n");
 
         }else{
             /*Clock de Ociosidade*/

@@ -40,7 +40,7 @@ GP* newGP(char* nomeArquivo){
 /*Verificar Todos os Processos Criados*/
 void verificar(GP* gerenciador){
    BCP* novo = NULL;
-   printf("\033[1;31m");
+   printf("\033[1;35m");
 
    /* Começo da Fila de Processos */
    if (gerenciador->fila_processos != NULL){  
@@ -70,7 +70,7 @@ void verificar(GP* gerenciador){
    /* Começo da Fila de Processos PRONTOS */ 
    if (gerenciador->fila_pronto != NULL){ 
       novo = gerenciador->fila_pronto->prox;
-      printf("\033[1;35m");
+      printf("\033[1;32m");
       printf("Fila de Processos PRONTOS: \n");
       while(novo->id != -10 && novo != NULL ){
          printf("+---------------------------");
@@ -78,6 +78,7 @@ void verificar(GP* gerenciador){
          printf("\n|Tempo de CPU: %d",novo->tempo_cpu);
          printf("\n|Prioridade : %d",novo->prioridade);
          printf("\n|Tempo e Chegada: %d",novo->tempo_chegada);
+         printf("\n|Tempo Executado: %d",novo->tempo_executado);
          if (novo->filaIO[0] != -10) printf("\n|Tempo do I/O: ");
          
          int j = 0;
@@ -94,7 +95,7 @@ void verificar(GP* gerenciador){
    /* Começo da Fila de Processos Finalizados */ 
    if (gerenciador->fila_finalizados != NULL){ 
       novo = gerenciador->fila_finalizados->prox;
-      printf("\033[1;35m");
+      printf("\033[1;31m");
       printf("Fila de Processos Finalizados: \n");
       int cont = 0;
       int soma = 0;
@@ -113,7 +114,7 @@ void verificar(GP* gerenciador){
       }
 
       printf("\nNumero de Processos Executado: %d",cont);
-      printf("\nTempo Médio de Execução: %.1f s",(float)(soma/cont));
+     // printf("\nTempo Médio de Execução: %.1f s",(float)(soma/cont));
    }else{ printf("-----Fila de Processos Finalizados VAZIA -\n"); }
    /* Fim da Fila de Processos PRONTOS*/ 
 

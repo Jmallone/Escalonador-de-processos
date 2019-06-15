@@ -12,6 +12,7 @@ typedef struct bcp{
    int tempo_inicio; 
    int tempo_executado; 
    int tempoIO;
+   int tempoQuantun;
    int tempo_fim;
    int tempo_espera;
    
@@ -72,6 +73,7 @@ void addBCP(BCP* unidade ,char* newline){
    novo->tempo_inicio = 0;
    novo->tempo_executado = 0;
    novo->tempoIO = 0;
+   novo->tempoQuantun = -10;
    novo->tempo_fim = 0;
    novo->tempo_espera = 0;
 
@@ -83,7 +85,7 @@ void addBCP(BCP* unidade ,char* newline){
   unidade->prox = novo;
 }
 
-/*Adiciona um processo em uma Lista*/
+/*Adiciona um processo no final de uma Lista*/
 void addBCPLista(BCP* processo, BCP** lista){
 
   if((*lista) == NULL) *lista = newBCP();
@@ -95,7 +97,7 @@ void addBCPLista(BCP* processo, BCP** lista){
 
 }
 
-/*Deleta o Processo daquela Lista*/
+/*Desvincula o Processo daquela Lista*/
 void delBCP(BCP* p){
 
     p->ant->prox = p->prox;
