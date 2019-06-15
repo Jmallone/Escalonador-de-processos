@@ -4,29 +4,32 @@
 
 /*Verificar Todos os Processos Criados*/
 void verificar(GP* gerenciador){
-
-   /* Começo da Fila de Processos */ 
-   BCP* novo = gerenciador->fila_processos->prox;
+   BCP* novo = NULL;
    printf("\033[1;31m");
-   printf("Fila de Processos: \n");
-   while(novo->id != -10 && novo != NULL ){
-      printf("+---------------------------");
-      printf("\n|Id do processo: %d",novo->id);
-      printf("\n|Tempo de CPU: %d",novo->tempo_cpu);
-      printf("\n|Prioridade : %d",novo->prioridade);
-      printf("\n|Tempo e Chegada: %d",novo->tempo_chegada);
-      if (novo->filaIO[0] != -10) printf("\n|Tempo do I/O: ");
-      
-      int j = 0;
-      while(novo->filaIO[j] != -10){
-         printf(" %d ", novo->filaIO[j]);
-         j++;
-      }
-      printf("\n+---------------------------\n\n");
-      novo = novo->prox;
-   }
-   /* Fim da Fila de Processos */ 
 
+   /* Começo da Fila de Processos */
+   if (gerenciador->fila_processos != NULL){  
+      novo = gerenciador->fila_processos->prox;
+
+      printf("Fila de Processos: \n");
+      while(novo->id != -10 && novo != NULL ){
+         printf("+---------------------------");
+         printf("\n|Id do processo: %d",novo->id);
+         printf("\n|Tempo de CPU: %d",novo->tempo_cpu);
+         printf("\n|Prioridade : %d",novo->prioridade);
+         printf("\n|Tempo e Chegada: %d",novo->tempo_chegada);
+         if (novo->filaIO[0] != -10) printf("\n|Tempo do I/O: ");
+         
+         int j = 0;
+         while(novo->filaIO[j] != -10){
+            printf(" %d ", novo->filaIO[j]);
+            j++;
+         }
+         printf("\n+---------------------------\n\n");
+         novo = novo->prox;
+      }
+   /* Fim da Fila de Processos */ 
+   }
    /* Começo da Fila de Processos PRONTOS */ 
    if (gerenciador->fila_pronto != NULL){ 
       novo = gerenciador->fila_pronto->prox;
@@ -60,8 +63,10 @@ void verificar(GP* gerenciador){
          printf("+---------------------------");
          printf("\n|Id do processo: %d",novo->id);
          printf("\n|Tempo de CPU: %d",novo->tempo_cpu);
-         printf("\n|Prioridade : %d",novo->prioridade);
-         printf("\n|Tempo e Chegada: %d",novo->tempo_chegada);
+         printf("\n|Tempo de Chegada: %d",novo->tempo_chegada);
+         printf("\n|Tempo de Tempo Inicio: %d",novo->tempo_inicio);
+         printf("\n|Tempo de Tempo Fim: %d",novo->tempo_fim);
+         printf("\n|Tempo Executado: %d",novo->tempo_executado);
          if (novo->filaIO[0] != -10) printf("\n|Tempo do I/O: ");
          
          int j = 0;
