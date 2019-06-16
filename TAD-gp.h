@@ -89,12 +89,12 @@ void verificar(GP* gerenciador){
          printf("\n+---------------------------\n\n");
          novo = novo->prox;
       }
-   }else{ printf("-----Fila de Processos PRONTOS VAZIA -\n"); }
+   }else{ printf("-----Fila de Processos PRONTOS: VAZIA -\n"); }
    /* Fim da Fila de Processos PRONTOS*/
 
    /* Começo da Fila de Processos BLOQUEADOS */ 
    if (gerenciador->fila_bloqueado != NULL){ 
-      novo = gerenciador->fila_pronto->prox;
+      novo = gerenciador->fila_bloqueado->prox;
       printf("\033[1;30m");
       printf("Fila de Processos BLOQUEADOS: \n");
       while(novo->id != -10 && novo != NULL ){
@@ -107,7 +107,7 @@ void verificar(GP* gerenciador){
          printf("\n+---------------------------\n\n");
          novo = novo->prox;
       }
-   }else{ printf("-----Fila de Processos BLOQUEADOS VAZIA -\n"); }
+   }else{ printf("-----Fila de Processos BLOQUEADOS: VAZIA -\n"); }
    /* Fim da Fila de Processos BLOQUEADOS*/ 
 
    /* Começo da Fila de Processos Finalizados */ 
@@ -133,7 +133,7 @@ void verificar(GP* gerenciador){
 
       printf("\nNumero de Processos Executado: %d",cont);
      // printf("\nTempo Médio de Execução: %.1f s",(float)(soma/cont));
-   }else{ printf("-----Fila de Processos Finalizados VAZIA -\n"); }
+   }else{ printf("-----Fila de Processos Finalizados: VAZIA -\n"); }
    /* Fim da Fila de Processos PRONTOS*/ 
 
    printf("\033[0m");

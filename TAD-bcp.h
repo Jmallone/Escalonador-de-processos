@@ -12,7 +12,6 @@ typedef struct bcp{
    int tempo_inicio; 
    int tempo_executado; 
    int tempoIO;
-   int tempoQuantun;
    int tempo_fim;
    int tempo_espera;
    
@@ -73,7 +72,6 @@ void addBCP(BCP* unidade ,char* newline){
    novo->tempo_inicio = 0;
    novo->tempo_executado = 0;
    novo->tempoIO = 0;
-   novo->tempoQuantun = -10;
    novo->tempo_fim = 0;
    novo->tempo_espera = 0;
 
