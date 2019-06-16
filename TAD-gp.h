@@ -90,7 +90,25 @@ void verificar(GP* gerenciador){
          novo = novo->prox;
       }
    }else{ printf("-----Fila de Processos PRONTOS VAZIA -\n"); }
-   /* Fim da Fila de Processos PRONTOS*/ 
+   /* Fim da Fila de Processos PRONTOS*/
+
+   /* Começo da Fila de Processos BLOQUEADOS */ 
+   if (gerenciador->fila_bloqueado != NULL){ 
+      novo = gerenciador->fila_pronto->prox;
+      printf("\033[1;30m");
+      printf("Fila de Processos BLOQUEADOS: \n");
+      while(novo->id != -10 && novo != NULL ){
+         printf("+---------------------------");
+         printf("\n|Id do processo: %d",novo->id);
+         printf("\n|Tempo de CPU: %d",novo->tempo_cpu);
+         printf("\n|T Sair IO : %d",novo->tempoIO);
+         printf("\n|Tempo e Chegada: %d",novo->tempo_chegada);
+         printf("\n|Tempo Executado: %d",novo->tempo_executado);
+         printf("\n+---------------------------\n\n");
+         novo = novo->prox;
+      }
+   }else{ printf("-----Fila de Processos BLOQUEADOS VAZIA -\n"); }
+   /* Fim da Fila de Processos BLOQUEADOS*/ 
 
    /* Começo da Fila de Processos Finalizados */ 
    if (gerenciador->fila_finalizados != NULL){ 

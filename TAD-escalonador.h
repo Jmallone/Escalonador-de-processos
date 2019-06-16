@@ -9,6 +9,8 @@ typedef struct escalonador {
 
 void sortList(BCP* unidade); // Ordena uma Lista
 int verificaFilaProcessos(GP* unidade, ESCALONADOR* escal); // Verfica se existem processos para entrar na Lista de Prontos
+int verificaFilaBloqueado(GP* unidade, ESCALONADOR* escal); // Verifica se existe Processos para serem atualizados (RR)
+
 int escalonar(ESCALONADOR* escal, BCP** origem, BCP** destino); // Passa um Processo de uma Lista para a Outra
 void FIFO(GP* unidade); // Algoritmo de Escalonamento
 void RR(GP* unidade); // Algoritmo de Escalonamento
@@ -50,6 +52,34 @@ void sortList(BCP* unidade){
     }
 } 
 
+int verificaFilaBloqueado(GP* unidade, ESCALONADOR* escal){
+
+    /*Se existir processos e o tempo de CPU for >= ao menor tempo na fila então escalona*/
+     if((unidade->fila_bloqueado != NULL)){   
+        BCP* atual = unidade->fila_bloqueado->prox;
+
+        /* Percorro toda a lista de Bloqueados e vou atualizando o Tempo de I/O */
+        while(atual->id != -10){
+            atual->tempoIO = atual->tempoIO - 1;
+
+            /* Se achou Tempo de I/O acabou ele volta para o Fim da Fila de Prontos */
+
+            /*???? Sempre Vai estar em ordem qual processo vai acabar primeiro ? 
+            
+            Vou considerar por enquanto que sim*/
+            if(atual->tempoIO <= 0){
+
+                escalonar(escal,&unidade->fila_bloqueado,&unidade->fila_pronto);
+            }
+
+
+        }
+
+        return 1;
+    }
+    return 0;
+}
+
 int verificaFilaProcessos(GP* unidade, ESCALONADOR* escal){
 
     /*Se existir processos e o tempo de CPU for >= ao menor tempo na fila então escalona*/
@@ -64,6 +94,10 @@ int escalonar(ESCALONADOR* escal, BCP** origem, BCP** destino){
 
     /*Coloca o processo em alguma lista destino */
     if((*origem) != NULL){
+
+        /*Condição para evitar colocar um Processo que o 
+        tempo de chegada é 5 e o tempo no Clock é 2
+        */
         if(escal->tempo >= (*origem)->prox->tempo_chegada){
             BCP* tmp = (*origem)->prox;
             delBCP((*origem)->prox);
@@ -103,7 +137,7 @@ int escalonar(ESCALONADOR* escal, BCP** origem, BCP** destino){
 int solicitaIO(BCP* processo, ESCALONADOR* escal){
     int i = 0;
     while(processo->filaIO[i] != -10){
-        if(processo->filaIO[i] >= processo->tempo_executado){
+        if(processo->filaIO[i] == processo->tempo_executado){
 
             /*Deslocamento do Vetor para Excluir aquele tempo de I/0 */
             while(processo->filaIO[i] != -10){
@@ -116,7 +150,6 @@ int solicitaIO(BCP* processo, ESCALONADOR* escal){
     }
     return 0;
 }
-
 
 void FIFO(GP* unidade){
     printf("\n\n+--- STEP-BY-STEP ---- \n");
@@ -171,7 +204,7 @@ void FIFO(GP* unidade){
 }
 
 void RR(GP* unidade){
-
+    int contador_debug = 0;
     /*Organiza por tempo de chegada*/
     sortList(unidade->fila_processos);
 
@@ -189,7 +222,9 @@ void RR(GP* unidade){
     /*Se ainda Existir Processos na Fila de Pronto e fila de Procesos */
     while( (unidade->fila_pronto != NULL) || (unidade->fila_processos != NULL) ){
         
+        verificaFilaBloqueado(unidade,escalonador);
         verificaFilaProcessos(unidade,escalonador);
+        
         
         /* Se existir alguem na Fila de Pronto Executar: Se não fica ocioso*/
         if(unidade->fila_pronto != NULL ){
@@ -206,15 +241,20 @@ void RR(GP* unidade){
                 printf("| Q [%d] ---\n",quantun);
                 printf("| CLOCK TIME [%d] ---\n", escalonador->tempo);
 
+
+                verificaFilaBloqueado(unidade,escalonador);
                 /* Chamo a função para verificar se entrou algum processo no tempo Atual*/
                 verificaFilaProcessos(unidade,escalonador);
                 
                 /* Verifica se o Processo Atual vai fazer I/0 */
                 if(solicitaIO(processo,escalonador)){
                     printf("|Fez I/O no Tempo [%d]\n", processo->tempo_executado);
-                    /* Quando Se faz I/0 demora 3 Clock */
-                    escalonador->tempo = escalonador->tempo + 3;
+                    /* Quando Se faz I/0 demora 3 Clock 
+                    processo->tempoIO = 3;
+                    escalonar(escalonador,&unidade->fila_pronto,&unidade->fila_bloqueado);
+                    quantun = 0;*/
                 }
+              
                 
             }
                 printf("+-----------------+\n\n");
@@ -248,6 +288,9 @@ void RR(GP* unidade){
         }else{
             /*Clock de Ociosidade*/
             escalonador->tempo++;
-        }  
+        }
+
+        if(contador_debug > 3) exit(0);
+        contador_debug++;  
    } 
 }
