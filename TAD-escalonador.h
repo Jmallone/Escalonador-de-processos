@@ -6,7 +6,8 @@ typedef struct escalonador {
    int tempo;
 }ESCALONADOR; 
 
-void sortList(BCP* unidade); // Ordena uma Lista
+void sortList(BCP* unidade); // Ordena a Lista de Processos
+void sortList_Tempo_CPU(BCP* unidade); //Ordena a Lista de Prontos pelo menor tempo a ser executado
 int verificaFilaProcessos(GP* unidade, ESCALONADOR* escal); // Verfica se existem processos para entrar na Lista de Prontos
 int verificaFilaBloqueado(GP* unidade, ESCALONADOR* escal); // Verifica se existe Processos para serem atualizados (RR)
 int escalonar(ESCALONADOR* escal, BCP** origem, BCP** destino); // Passa um Processo de uma Lista para a Outra
@@ -52,6 +53,7 @@ void sortList(BCP* unidade){
     }
 } 
 
+/*Ordena a Lista de Prontos pelo menor tempo a ser executado*/
 void sortList_Tempo_CPU(BCP* unidade){ 
     BCP* atual = unidade;
     BCP* index = NULL; 
@@ -408,9 +410,10 @@ void SRTF(GP* unidade){
                 
                 /* Chamo a função para verificar se entrou algum processo no tempo Atual*/
                 verificaFilaProcessos(unidade,escalonador);
-                /*Orgaiza os processos pelo menor tempo na CPU */
+                /*Organiza os processos pelo menor tempo na CPU */
                 sortList_Tempo_CPU(unidade->fila_pronto);
 
+                /* Verifica se o tempo restante do processo que esta no Começo da fila é Menor que o processo atual */
                 if(unidade->fila_pronto->prox->tempo_cpu - unidade->fila_pronto->prox->tempo_executado < processo->tempo_cpu - processo->tempo_executado ){
 
                         time = 0;
@@ -425,8 +428,9 @@ void SRTF(GP* unidade){
                          /*Desvincula o Processo daquela Lista*/
                         delBCP(processo);
 
-                        /* Adiciona o Processo a Lista destino Mas Trato Lista como se fosse Fila */
+                        /* Adiciona o Processo atual na Lista pronto */
                         addBCPLista(processo,&unidade->fila_pronto);
+                        /* Quando o While Rodar Ele pegara o Processo com o menor tempo de CPU*/
                         
 
                 }
