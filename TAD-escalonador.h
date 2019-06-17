@@ -52,6 +52,41 @@ void sortList(BCP* unidade){
     }
 } 
 
+void sortList_Tempo_CPU(BCP* unidade){ 
+    BCP* atual = unidade;
+    BCP* index = NULL; 
+    BCP* temp = NULL;
+    BCP* var = NULL;
+    
+    if(unidade == NULL) {
+      printf("\n Unidade Vazia!");
+        return;  
+    }else{ 
+ 
+        for(atual = unidade->prox; atual->id != -10; atual = atual->prox) {  
+            for(index = atual->prox; index->id != -10; index = index->prox) {  
+                if(atual->tempo_cpu - atual->tempo_executado > index->tempo_cpu - index->tempo_executado) {  
+                    
+                    temp = atual;  
+                    atual = index;                 
+                    temp->ant->prox = atual;
+                    atual->ant->prox = temp;
+                    var = temp->ant;
+                    temp->ant = atual->ant;
+                    atual->ant = var;
+                    var =  atual->prox;
+                    atual->prox = temp->prox;
+                    temp->prox = var;
+                    atual->prox->ant = atual;
+                    var->ant = temp;
+                    
+                }
+                
+            } 
+        }   
+    }
+} 
+
 int verificaFilaBloqueado(GP* unidade, ESCALONADOR* escal){
 
     /*Se existir processos*/
@@ -331,5 +366,93 @@ void RR(GP* unidade){
 
 void SRTF(GP* unidade){
 
-    printf("\n Dentro da SRTF \n");
+    printf("\n\n+--- STEP-BY-STEP ---- \n");
+    
+    /* Cria o escalonador para controlar o tempo */
+    ESCALONADOR *escalonador = (ESCALONADOR*)malloc(sizeof(ESCALONADOR));
+    escalonador->tempo = 0;
+
+    /*Organiza os processos por tempo de chegada*/
+    sortList(unidade->fila_processos);
+
+    /*Se ainda Existir Processos na Fila de Pronto e na Fila de Processos */
+    while( (unidade->fila_pronto != NULL) || (unidade->fila_processos != NULL) ){
+        
+        verificaFilaProcessos(unidade,escalonador);
+        /*Organiza os processos pelo menor tempo na CPU */
+        sortList_Tempo_CPU(unidade->fila_pronto);
+        
+        /* Se existir alguem na Fila de Pronto Executar: Se não fica ocioso*/
+        if(unidade->fila_pronto != NULL ){
+
+            /*  Atribui o processo em questão para uma Variavel e 
+                atribui em qual tempo o processo começou na CPU */
+            BCP* processo = unidade->fila_pronto->prox;
+            processo->tempo_inicio = escalonador->tempo;
+
+            int time = 1;
+            /*Enquanto o processo ainda tiver tempo de CPU continue*/
+            while( (processo->tempo_cpu) - (processo->tempo_executado) > 0 && time != 0){
+                /* Executa 1Clock */
+                processo->tempo_executado++; 
+                escalonador->tempo++;
+
+                printf("|Processo [%d] - Tempo Exec [%d/%d]\n", processo->id,processo->tempo_executado,processo->tempo_cpu);
+                printf("| -TIME CPU [%d] ---\n", escalonador->tempo);
+
+                /* Verifica se o Processo Atual vai fazer I/0 */
+                if(solicitaIO(processo,escalonador)){
+                    /* Quando Se faz I/0 demora 3 Clock */
+//                    escalonador->tempo = escalonador->tempo + 3;
+                }
+                
+                /* Chamo a função para verificar se entrou algum processo no tempo Atual*/
+                verificaFilaProcessos(unidade,escalonador);
+                /*Orgaiza os processos pelo menor tempo na CPU */
+                sortList_Tempo_CPU(unidade->fila_pronto);
+
+                if(unidade->fila_pronto->prox->tempo_cpu - unidade->fila_pronto->prox->tempo_executado < processo->tempo_cpu - processo->tempo_executado ){
+
+                        time = 0;
+
+                        printf("\033[1;32m");
+                        printf("|    !Processo ID [%d] - TEMPO CPU Restante[%d]\n",unidade->fila_pronto->prox->id,unidade->fila_pronto->prox->tempo_cpu - unidade->fila_pronto->prox->tempo_executado);
+                        printf("|    !È Maior que o Processo Atual\n");
+                        printf("|    !Processo ID [%d] - TEMPO CPU Restante[%d]\n",processo->id,processo->tempo_cpu - processo->tempo_executado);
+                        printf("|    !Processo Atual Irá ser reorganizado na Fila de Prontos\n");
+                        printf("\033[0m");
+                
+                         /*Desvincula o Processo daquela Lista*/
+                        delBCP(processo);
+
+                        /* Adiciona o Processo a Lista destino Mas Trato Lista como se fosse Fila */
+                        addBCPLista(processo,&unidade->fila_pronto);
+                        
+
+                }
+
+
+            } /*O Processo Ficará nesse While até seu tempo de CPU for completado*/
+
+
+                printf("+-----------------+\n\n");
+                    if ((processo->tempo_cpu) - (processo->tempo_executado) <= 0){
+                    /*Depois que o Processo Termina ele vai para a Lista de Finalizados */
+                    escalonar(escalonador,&unidade->fila_pronto,&unidade->fila_finalizados); 
+                    unidade->fila_finalizados->ant->tempo_fim = escalonador->tempo;
+                    
+                    /*Ajuste para o Tempo Total Executado Caso o Processo faça I/O*/
+                    unidade->fila_finalizados->ant->tempo_executado =( unidade->fila_finalizados->ant->tempo_fim - unidade->fila_finalizados->ant->tempo_inicio);
+                }
+
+        }else{
+            /*Clock de Ociosidade*/
+            escalonador->tempo++;
+        }  
+   }
+    printf("\n\n ------------------- ESCOLONAMENTO FINALIZADO ------------------- \n\n"); 
+    verificar(unidade);
+    printf("\n\n"); 
+
+
 }
