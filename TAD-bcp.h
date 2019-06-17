@@ -36,7 +36,6 @@ BCP* newBCP(){
 	return bcp;	
 }
 
-
 /* Pega informações do TXT */
 void addBCP(BCP* unidade ,char* newline){
 
@@ -45,7 +44,7 @@ void addBCP(BCP* unidade ,char* newline){
     int i = 0;
     char delim[] = " ";
     char *ptr = strtok(newline, delim);
-     while(ptr != NULL){
+    while(ptr != NULL){
         tmp[i] = atoi (ptr);
         ptr = strtok(NULL, delim);
         i++;
@@ -53,7 +52,7 @@ void addBCP(BCP* unidade ,char* newline){
     
     i--;
   BCP* novo = (BCP*)malloc(sizeof(BCP));
-/*Começo do Parsing do new Line*/
+  /*Começo do Parsing de cada new Line*/
   novo->id = tmp[0];
   novo->tempo_cpu = tmp[1];
   novo->prioridade = tmp[2];
@@ -61,22 +60,23 @@ void addBCP(BCP* unidade ,char* newline){
 
   for (int j=0 ; j< 100;j++) novo->filaIO[j] = -10;
 
-/* Se existir Lista de Eventos de I/O */
+  /* Se existir Lista de Eventos de I/O */
   if (i > 3){
     for(int j = 0; j<(i-3);j++){
         novo->filaIO[j] = tmp[(i-2)+j];
     }
   }
-/*Fim do Parsing*/
+  /*Fim do Parsing*/
 
-   novo->tempo_inicio = 0;
-   novo->tempo_executado = 0;
-   novo->tempoIO = 0;
-   novo->tempo_fim = 0;
-   novo->tempo_espera = 0;
+  /* Setando o resto das Variaveis do BCP*/
+  novo->tempo_inicio = 0;
+  novo->tempo_executado = 0;
+  novo->tempoIO = 0;
+  novo->tempo_fim = 0;
+  novo->tempo_espera = 0;
 
 
-/* Inserção da Lista Duplamente encadeada */
+  /* Inserção da Lista Duplamente encadeada */
   novo->ant = unidade->prox->ant;
   novo->prox = unidade->prox;
   unidade->prox->ant = novo;

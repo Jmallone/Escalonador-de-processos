@@ -40,7 +40,9 @@ int main ( void )
          RR(gerenciador);
          break;
       case 5:
+         
          printf(" ------ SRTF -------- ");
+         SRTF(gerenciador);
          break;
       case 6:
          printf(" ------ Prioridade -------- ");

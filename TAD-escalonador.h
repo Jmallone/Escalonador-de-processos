@@ -6,14 +6,14 @@ typedef struct escalonador {
    int tempo;
 }ESCALONADOR; 
 
-
 void sortList(BCP* unidade); // Ordena uma Lista
 int verificaFilaProcessos(GP* unidade, ESCALONADOR* escal); // Verfica se existem processos para entrar na Lista de Prontos
 int verificaFilaBloqueado(GP* unidade, ESCALONADOR* escal); // Verifica se existe Processos para serem atualizados (RR)
-
 int escalonar(ESCALONADOR* escal, BCP** origem, BCP** destino); // Passa um Processo de uma Lista para a Outra
+int solicitaIO(BCP* processo, ESCALONADOR* escal); // Verifica se o Processo Atual vai fazer I/0
 void FIFO(GP* unidade); // Algoritmo de Escalonamento
 void RR(GP* unidade); // Algoritmo de Escalonamento
+void SRTF(GP* unidade); // Algoritmo de Escalonamento
 
 
 /*Ordena Lista por tempo de Chegada*/
@@ -57,11 +57,11 @@ int verificaFilaBloqueado(GP* unidade, ESCALONADOR* escal){
     /*Se existir processos*/
      if((unidade->fila_bloqueado != NULL)){
          
-         
+        /*Pega o primeiro elemento da lista depois do Sentinela*/ 
         BCP* atual = unidade->fila_bloqueado->prox;
 
-        /* Percorro toda a lista de Bloqueados e vou atualizando o Tempo de I/O */
-        while(atual->id != -10){
+        /* Percorre toda a lista de Bloqueados e vai atualizando o Tempo de I/O */
+        while(atual->id != -10){ // O ID do sentinela é (-10)
             atual->tempoIO = atual->tempoIO - 1;
 
             /* Se achou Tempo de I/O acabou ele volta para o Fim da Fila de Prontos */
@@ -88,7 +88,7 @@ int verificaFilaBloqueado(GP* unidade, ESCALONADOR* escal){
 
 int verificaFilaProcessos(GP* unidade, ESCALONADOR* escal){
 
-    /*Se existir processos e o tempo de CPU for >= ao menor tempo na fila então escalona*/
+    /*Se existir processos e o tempo de CPU for >= tempo na fila então escalona*/
      if((unidade->fila_processos != NULL) && (escal->tempo >= unidade->fila_processos->prox->tempo_chegada ) ){
         printf("\033[1;34m");   
         printf("|    !Processo ID [%d] entrou em Pronto - TIME CPU [%d]\n",unidade->fila_processos->prox->id,escal->tempo);
@@ -130,11 +130,9 @@ int escalonar(ESCALONADOR* escal, BCP** origem, BCP** destino){
             if(( (*origem)->prox->id == -10) && ((*origem)->ant->id == -10)){
                free((*origem)->prox);
                (*origem) = NULL;
-            
             }
 
-            /* Adiciona o Processo a Lista destino Mas como se fosse Fila */
-
+            /* Adiciona o Processo a Lista destino Mas Trato Lista como se fosse Fila */
             addBCPLista(tmp,destino);
             return 1;
         }
@@ -148,6 +146,8 @@ int escalonar(ESCALONADOR* escal, BCP** origem, BCP** destino){
 int solicitaIO(BCP* processo, ESCALONADOR* escal){
     int i = 0;
     while(processo->filaIO[i] != -10){
+
+        /* Se Existe um tempo de I/O Correspondendo ao Tempo Executado do processo*/
         if(processo->filaIO[i] == processo->tempo_executado){
 
             /*Deslocamento do Vetor para Excluir aquele tempo de I/0 */
@@ -166,6 +166,12 @@ int solicitaIO(BCP* processo, ESCALONADOR* escal){
     return 0;
 }
 
+/*
+
+    Algoritmos de Escalonamento Abaixo:
+
+*/
+
 void FIFO(GP* unidade){
     printf("\n\n+--- STEP-BY-STEP ---- \n");
     
@@ -173,22 +179,26 @@ void FIFO(GP* unidade){
     ESCALONADOR *escalonador = (ESCALONADOR*)malloc(sizeof(ESCALONADOR));
     escalonador->tempo = 0;
 
-    /*Organiza por tempo de chegada*/
+    /*Organiza os processos por tempo de chegada*/
     sortList(unidade->fila_processos);
 
-    /*Se ainda Existir Processos na Fila de Pronto e fila de Procesos */
+    /*Se ainda Existir Processos na Fila de Pronto e na Fila de Processos */
     while( (unidade->fila_pronto != NULL) || (unidade->fila_processos != NULL) ){
         
         verificaFilaProcessos(unidade,escalonador);
         
         /* Se existir alguem na Fila de Pronto Executar: Se não fica ocioso*/
         if(unidade->fila_pronto != NULL ){
+
+            /*  Atribui o processo em questão para uma Variavel e 
+                atribui em qual tempo o processo começou na CPU */
             BCP* processo = unidade->fila_pronto->prox;
             processo->tempo_inicio = escalonador->tempo;
 
             /*Enquanto o processo ainda tiver tempo de CPU continue*/
             while( (processo->tempo_cpu) - (processo->tempo_executado) > 0){
-                processo->tempo_executado++; //Processo Executou 1Clock
+                /* Executa 1Clock */
+                processo->tempo_executado++; 
                 escalonador->tempo++;
 
                 printf("|Processo [%d] - Tempo Exec [%d/%d]\n", processo->id,processo->tempo_executado,processo->tempo_cpu);
@@ -202,25 +212,31 @@ void FIFO(GP* unidade){
                 
                 /* Chamo a função para verificar se entrou algum processo no tempo Atual*/
                 verificaFilaProcessos(unidade,escalonador);
-            }
+
+            } /*O Processo Ficará nesse While até seu tempo de CPU for completado*/
+
+
                 printf("+-----------------+\n\n");
                 
                 /*Depois que o Processo Termina ele vai para a Lista de Finalizados */
                 escalonar(escalonador,&unidade->fila_pronto,&unidade->fila_finalizados); 
                 unidade->fila_finalizados->ant->tempo_fim = escalonador->tempo;
                 
-                /*Ajuste para o Tempo Total Executado Caso o Processo fez I/O*/
+                /*Ajuste para o Tempo Total Executado Caso o Processo faça I/O*/
                 unidade->fila_finalizados->ant->tempo_executado =( unidade->fila_finalizados->ant->tempo_fim - unidade->fila_finalizados->ant->tempo_inicio);
 
         }else{
             /*Clock de Ociosidade*/
             escalonador->tempo++;
         }  
-   } 
+   }
+    printf("\n\n ------------------- ESCOLONAMENTO FINALIZADO ------------------- \n\n"); 
+    verificar(unidade);
+    printf("\n\n"); 
 }
 
 void RR(GP* unidade){
-    int contador_debug = 0;
+
     /*Organiza por tempo de chegada*/
     sortList(unidade->fila_processos);
 
@@ -233,22 +249,20 @@ void RR(GP* unidade){
     ESCALONADOR *escalonador = (ESCALONADOR*)malloc(sizeof(ESCALONADOR));
     escalonador->tempo = 0;
 
-
-
-    /*Se ainda Existir Processos na Fila de Pronto e fila de Procesos */
+    /*Se ainda Existir Processos na Fila de Pronto, Fila de Processos e Fila de Bloqueados */
     while( (unidade->fila_pronto != NULL) || (unidade->fila_processos != NULL) || (unidade->fila_bloqueado != NULL) ){
         
         verificaFilaBloqueado(unidade,escalonador);
-        
         verificaFilaProcessos(unidade,escalonador);
         
         /* Se existir alguem na Fila de Pronto Executar: Se não fica ocioso*/
         if(unidade->fila_pronto != NULL ){
+
             int quantun = 2;
             BCP* processo = unidade->fila_pronto->prox;
             processo->tempo_inicio = escalonador->tempo;
 
-            /*Enquanto o processo ainda tiver tempo de CPU continue*/
+            /*Enquanto o processo ainda tiver tempo de CPU e o quantun for valido continue*/
             while( (processo->tempo_cpu) - (processo->tempo_executado) > 0 && quantun != 0){
                 processo->tempo_executado++; //Processo Executou 1Clock
                 escalonador->tempo++;
@@ -264,8 +278,9 @@ void RR(GP* unidade){
                 /* Verifica se o Processo Atual vai fazer I/0 */
                 if(solicitaIO(processo,escalonador)){
                     /* Quando Se faz I/0 demora 3 Clock */
-                    processo->tempoIO = 3;
 
+                    /* Contador Interno do processo para saber quantos clock ficara em bloqueado*/
+                    processo->tempoIO = 3;
                     escalonar(escalonador,&unidade->fila_pronto,&unidade->fila_bloqueado);
                     
                     verificar(unidade);
@@ -283,7 +298,6 @@ void RR(GP* unidade){
                 /*Depois que o Processo Termina ele vai para a Lista de Finalizados */
                 escalonar(escalonador,&unidade->fila_pronto,&unidade->fila_finalizados);
                 unidade->fila_finalizados->ant->tempo_fim = escalonador->tempo;
-                //quantun = 0;
             }
 
             /* Se o quantun acabou mas ainda existe Clock a ser executado no processo 
@@ -299,7 +313,6 @@ void RR(GP* unidade){
                     delBCP(processo);
                     /* Adiciona Processo Atual ao final da Lista(FILA) de Pronto */
                     addBCPLista(processo,&unidade->fila_pronto);
-                    
                 }
             }
 
@@ -314,4 +327,9 @@ void RR(GP* unidade){
     printf("\n\n ------------------- ESCOLONAMENTO FINALIZADO ------------------- \n\n"); 
     verificar(unidade);
     printf("\n\n"); 
+}
+
+void SRTF(GP* unidade){
+
+    printf("\n Dentro da SRTF \n");
 }
