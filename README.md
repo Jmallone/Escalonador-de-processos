@@ -12,6 +12,9 @@ Projeto de implementação de um [Escalonador de Processos](https://en.wikipedia
 	$ gcc main.c -o teste
 	$./teste
 	
+## Descrição do LOG:
+![](https://github.com/Jmallone/Escalonador-de-processos/blob/master/RR.png)
+	
 ## Referencias:
 
 [Maziero - Escalonamento_PDF](http://wiki.inf.ufpr.br/maziero/lib/exe/fetch.php?media=socm:socm-texto-06.pdf)
