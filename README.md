@@ -18,3 +18,5 @@ Projeto de implementação de um [Escalonador de Processos](https://en.wikipedia
 [Simulador Online de RR](http://lasdpc.icmc.usp.br/~ssc640/pos/i3s/index.php?lang=pt)
 
 [SRT](https://pt.wikipedia.org/wiki/Shortest_remaining_time)
+
+[SRTF](https://www.javatpoint.com/os-srtf-with-processes-contains-cpu-and-io-time)
