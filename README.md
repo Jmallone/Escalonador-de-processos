@@ -12,7 +12,7 @@ Projeto de implementação de um [Escalonador de Processos](https://en.wikipedia
 	$ gcc main.c -o teste
 	$./teste
 	
-## Descrição do LOG:
+## Descrição do LOG: :computer:
 ![](https://github.com/Jmallone/Escalonador-de-processos/blob/master/RR.png)
 	
 ## Referencias:
