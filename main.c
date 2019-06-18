@@ -46,6 +46,7 @@ int main ( void )
          break;
       case 6:
          printf(" ------ Prioridade -------- ");
+         PRIORIDADE(gerenciador);
          break;
       case 0:
          rodando = 0;

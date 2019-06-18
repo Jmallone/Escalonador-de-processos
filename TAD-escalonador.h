@@ -1,6 +1,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
+#include"grafico.h"
 
 typedef struct escalonador { 
    int tempo;
@@ -15,6 +16,7 @@ int solicitaIO(BCP* processo, ESCALONADOR* escal); // Verifica se o Processo Atu
 void FIFO(GP* unidade); // Algoritmo de Escalonamento
 void RR(GP* unidade); // Algoritmo de Escalonamento
 void SRTF(GP* unidade); // Algoritmo de Escalonamento
+void PRIORIDADE(GP* unidade); // Algoritmo de Escalonamento
 
 
 /*Ordena Lista por tempo de Chegada*/
@@ -261,6 +263,7 @@ void FIFO(GP* unidade){
                 
                 /*Ajuste para o Tempo Total Executado Caso o Processo faça I/O*/
                 unidade->fila_finalizados->ant->tempo_executado =( unidade->fila_finalizados->ant->tempo_fim - unidade->fila_finalizados->ant->tempo_inicio);
+                insertoText(unidade->fila_finalizados->ant);
 
         }else{
             /*Clock de Ociosidade*/
@@ -269,7 +272,13 @@ void FIFO(GP* unidade){
    }
     printf("\n\n ------------------- ESCOLONAMENTO FINALIZADO ------------------- \n\n"); 
     verificar(unidade);
-    printf("\n\n"); 
+    printf("\n\n");
+
+    /* para Mostrar o Diagrama */
+    int j = 0;
+    printf ("\nDeseja Visualizar o Diagrama de Grantt? (1)True 0(False) :\n");
+    scanf ("%d",&j);
+    if (j == 1) gerarGrafico("FIFO"); 
 }
 
 void RR(GP* unidade){
@@ -320,6 +329,7 @@ void RR(GP* unidade){
                     processo->tempoIO = 3;
                     escalonar(escalonador,&unidade->fila_pronto,&unidade->fila_bloqueado);
                     
+                    /*Gui para Visualizar os Processos*/
                     verificar(unidade);
                     printf("\n\n");
 
@@ -335,6 +345,11 @@ void RR(GP* unidade){
                 /*Depois que o Processo Termina ele vai para a Lista de Finalizados */
                 escalonar(escalonador,&unidade->fila_pronto,&unidade->fila_finalizados);
                 unidade->fila_finalizados->ant->tempo_fim = escalonador->tempo;
+
+
+
+
+                insertoText(unidade->fila_finalizados->ant);
             }
 
             /* Se o quantun acabou mas ainda existe Clock a ser executado no processo 
@@ -343,6 +358,7 @@ void RR(GP* unidade){
             if(quantun == 0 && (processo->tempo_cpu) - (processo->tempo_executado) > 0){
                 
                 if ((processo->tempoIO)<=0){
+                    insertoText(processo);
                     printf("\033[1;34m");   
                     printf("|    !Processo ID [%d] voltou para o FINAL de Pronto\n",processo->id);
                     printf("\033[0m");
@@ -363,7 +379,13 @@ void RR(GP* unidade){
 
     printf("\n\n ------------------- ESCOLONAMENTO FINALIZADO ------------------- \n\n"); 
     verificar(unidade);
-    printf("\n\n"); 
+    printf("\n\n");
+
+    /* para Mostrar o Diagrama */
+    int j = 0;
+    printf ("\nDeseja Visualizar o Diagrama de Grantt? (1)True 0(False) :\n");
+    scanf ("%d",&j);
+    if (j == 1) gerarGrafico("Round Robin"); 
 }
 
 void SRTF(GP* unidade){
@@ -460,3 +482,7 @@ void SRTF(GP* unidade){
 
 
 }
+
+void PRIORIDADE(GP* unidade){
+    gerarGrafico("Prioridade");
+} // Algoritmo de Escalonamento
