@@ -14,6 +14,8 @@ Projeto de implementação de um [Escalonador de Processos](https://en.wikipedia
 	
 ## Descrição do LOG: :computer:
 ![](https://github.com/Jmallone/Escalonador-de-processos/blob/master/RR.png)
+
+![](https://github.com/Jmallone/Escalonador-de-processos/blob/master/RR2.png)
 	
 ## Referencias:
 
