@@ -276,7 +276,7 @@ void FIFO(GP* unidade){
 
     /* para Mostrar o Diagrama */
     int j = 0;
-    printf ("\nDeseja Visualizar o Diagrama de Grantt? (1)True 0(False) :\n");
+    printf ("\nDeseja Visualizar o Diagrama de Gantt? (1)True 0(False) :\n");
     scanf ("%d",&j);
     if (j == 1) gerarGrafico("FIFO"); 
 }
@@ -383,7 +383,7 @@ void RR(GP* unidade){
 
     /* para Mostrar o Diagrama */
     int j = 0;
-    printf ("\nDeseja Visualizar o Diagrama de Grantt? (1)True 0(False) :\n");
+    printf ("\nDeseja Visualizar o Diagrama de Gantt? (1)True 0(False) :\n");
     scanf ("%d",&j);
     if (j == 1) gerarGrafico("Round Robin"); 
 }
